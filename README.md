@@ -14,6 +14,7 @@ A skill is just a folder with a `SKILL.md` inside. Claude Code reads it and gain
 | **generate-system-map** | Scans your skills and scheduled agents and generates a standalone interactive HTML map of your whole automation setup: a radial mind-map, a schedule view, and a feedback panel that outputs copy-ready fix prompts. Most useful once you run several skills or scheduled agents. | `/generate-system-map` |
 | **imessage** | Read and send iMessages from your Mac using built-in macOS tools, no third-party app. Drafts only by default, sends on your explicit "send it." Send mode needs one scoped permission; read mode (pulling past threads) needs Full Disk Access and warns you first. | `/imessage` |
 | **plain-english** | Rewrites Claude's last answer (or any text you point it at) into something short and jargon-free. Fire it the moment a reply is too long or too technical. It also nudges the rest of the session to stay plain. | `/plain-english` |
+| **swipe** | Turns digital cleanup into a Tinder-style swipe deck on your phone. Point it at a folder (or your unread texts), swipe each card left or right on your phone over local WiFi, and the actions run in one reversible batch (files to Trash, replies staged, never auto-sent). Built for the task paralysis where a folder of 300 screenshots is easier to ignore than to face. macOS. | `/swipe` |
 
 ## Why these exist
 

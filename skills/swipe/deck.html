@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>swipe</title>
+<style>
+  * { box-sizing: border-box; -webkit-user-select: none; user-select: none; }
+  html, body { margin: 0; height: 100%; }
+  body { background: #0f0f12; color: #fff; overflow: hidden;
+    font-family: -apple-system, system-ui, sans-serif;
+    display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+  #counter { flex: 0 0 auto; text-align: center; padding: 14px; font-size: 15px; color: #9aa; }
+  #stage { position: relative; flex: 1 1 auto; min-height: 0; }
+  .card { position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 86vw; max-width: 420px; background: #1c1c22; border-radius: 22px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5); overflow: hidden; display: flex;
+    flex-direction: column; touch-action: pan-y; }
+  .card img { width: 100%; flex: 1; object-fit: contain; background: #000; }
+  .filebox { flex: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 64px; }
+  .filepreview { flex: 1; overflow: auto; margin: 0; padding: 16px; background: #15151a;
+    font-family: ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.45;
+    white-space: pre-wrap; word-break: break-word; color: #cdd; }
+  .meta { padding: 16px; }
+  .meta .label { font-size: 18px; font-weight: 600; word-break: break-word; }
+  .meta .sub { font-size: 14px; color: #9aa; margin-top: 4px; }
+  .reply { margin: 0 16px 16px; width: calc(100% - 32px); padding: 12px;
+    border-radius: 12px; border: none; font-size: 16px; background: #2a2a33; color: #fff;
+    user-select: text; -webkit-user-select: text; }
+  .stamp { position: absolute; top: 28px; padding: 6px 14px; border: 3px solid;
+    border-radius: 10px; font-weight: 800; font-size: 26px; opacity: 0; }
+  .stamp.left  { right: 22px; color: #ff5c72; border-color: #ff5c72; transform: rotate(12deg); }
+  .stamp.right { left: 22px;  color: #4fd17a; border-color: #4fd17a; transform: rotate(-12deg); }
+  #bar { flex: 0 0 auto; padding: 18px; display: flex;
+    gap: 12px; justify-content: center; flex-wrap: wrap; }
+  button { font-size: 16px; padding: 14px 20px; border-radius: 14px; border: none;
+    font-weight: 600; }
+  .no { background: #ff5c72; color: #fff; } .yes { background: #4fd17a; color: #04210f; }
+  #done { background: #6f7bff; color: #fff; }
+  #undo { background: #2a2a33; color: #cdd; }
+  #undo:disabled { opacity: .35; }
+  #finished { position: absolute; inset: 0; display: none; align-items: center;
+    justify-content: center; font-size: 22px; text-align: center; padding: 40px; }
+</style>
+</head>
+<body>
+<div id="counter"></div>
+<div id="stage"></div>
+<div id="finished"></div>
+<div id="bar">
+  <button id="undo" disabled>↩ Undo</button>
+  <button class="no"  id="bNo"></button>
+  <button class="yes" id="bYes"></button>
+  <button id="done">Done</button>
+</div>
+<script>
+const M = /*__MANIFEST__*/null/*__END__*/;
+const items = M.items.slice();
+const decisions = [];
+let idx = 0;
+
+const stage = document.getElementById('stage');
+const counter = document.getElementById('counter');
+document.getElementById('bNo').textContent  = '← ' + M.left.label;
+document.getElementById('bYes').textContent = M.right.label + ' →';
+
+function post(done){
+  fetch('/decisions', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({done: !!done, decisions})}).catch(()=>{});
+}
+function updateCounter(){ counter.textContent = (idx) + ' / ' + items.length;
+  document.getElementById('undo').disabled = decisions.length === 0; }
+
+function undo(){
+  if (decisions.length === 0) return;
+  decisions.pop(); idx = Math.max(0, idx - 1);
+  document.getElementById('bar').style.display = 'flex';
+  document.getElementById('finished').style.display = 'none';
+  post(false); render();
+}
+
+function render(){
+  stage.innerHTML = '';
+  updateCounter();
+  if (idx >= items.length){ finish(); return; }
+  // render up to 2 cards for depth, top is interactive
+  for (let j = Math.min(idx+1, items.length-1); j >= idx; j--){
+    const it = items[j];
+    const card = document.createElement('div'); card.className = 'card';
+    card.style.zIndex = 100 - j;
+    if (j > idx) card.style.transform = 'translateX(-50%) scale(.96) translateY(10px)';
+    let media;
+    if (it.type === 'image'){ media = document.createElement('img'); media.src = '/thumb/'+it.id;
+      media.onerror = ()=>{ const b=document.createElement('div'); b.className='filebox'; b.textContent='🖼️'; media.replaceWith(b); }; }
+    else if (it.type === 'file' && it.preview){ media = document.createElement('pre');
+      media.className='filepreview'; media.textContent = it.preview; }
+    else { media = document.createElement('div'); media.className='filebox';
+      media.textContent = it.type === 'text' ? '💬' : '📄'; }
+    card.appendChild(media);
+    const meta = document.createElement('div'); meta.className='meta';
+    const label = document.createElement('div'); label.className='label';
+    label.textContent = it.type === 'text' ? it.sender : it.label;
+    const sub = document.createElement('div'); sub.className='sub';
+    sub.textContent = it.type === 'text' ? it.preview : it.sub;
+    meta.appendChild(label); meta.appendChild(sub); card.appendChild(meta);
+    if (M.reply && it.type === 'text'){
+      const inp = document.createElement('input'); inp.className='reply';
+      inp.placeholder = 'Type a reply, or swipe right blank for me to draft';
+      inp.addEventListener('pointerdown', e=>e.stopPropagation());  // don't start a drag
+      card.appendChild(inp);
+    }
+    for (const dir of ['left','right']){
+      const s = document.createElement('div'); s.className='stamp '+dir;
+      s.textContent = dir==='left'?M.left.label:M.right.label; card.appendChild(s);
+    }
+    stage.appendChild(card);
+    if (j === idx) attachDrag(card, it);
+  }
+}
+
+function attachDrag(card, it){
+  let startX=0, dx=0, dragging=false;
+  const left = card.querySelector('.stamp.left'), right = card.querySelector('.stamp.right');
+  card.addEventListener('pointerdown', e=>{ dragging=true; startX=e.clientX; card.setPointerCapture(e.pointerId); });
+  card.addEventListener('pointermove', e=>{ if(!dragging) return; dx=e.clientX-startX;
+    card.style.transform='translateX(calc(-50% + '+dx+'px)) rotate('+(dx/20)+'deg)';
+    left.style.opacity = dx<0 ? Math.min(1,-dx/120):0;
+    right.style.opacity = dx>0 ? Math.min(1, dx/120):0; });
+  card.addEventListener('pointerup', e=>{ if(!dragging) return; dragging=false;
+    if (Math.abs(dx)>110) decide(it, dx<0?'left':'right', card);
+    else card.style.transform='translateX(-50%)'; });
+  card.addEventListener('pointercancel', ()=>{ dragging=false; dx=0; card.style.transform='translateX(-50%)'; });
+}
+
+function decide(it, dir, card){
+  let reply = null;
+  if (M.reply && it.type==='text' && dir==='right'){
+    const inp = card ? card.querySelector('.reply') : null; reply = inp && inp.value.trim() ? inp.value.trim() : null;
+  }
+  decisions.push({id: it.id, dir, reply});
+  if (card){ card.style.transition='transform .25s';
+    card.style.transform='translateX('+(dir==='left'?-700:700)+'px) rotate('+(dir==='left'?-20:20)+'deg)'; }
+  idx++; post(false);
+  setTimeout(render, 260);
+}
+
+function finish(){
+  document.getElementById('bar').style.display='none';
+  const f = document.getElementById('finished'); f.style.display='flex';
+  f.textContent = '✅ Done. Go back to Claude and say "done".';
+  post(true);
+}
+
+document.getElementById('bNo').onclick  = ()=>{ if(idx<items.length) decide(items[idx],'left',  stage.querySelector('.card:last-child')); };
+document.getElementById('bYes').onclick = ()=>{ if(idx<items.length) decide(items[idx],'right', stage.querySelector('.card:last-child')); };
+document.getElementById('done').onclick = finish;
+document.getElementById('undo').onclick = undo;
+document.addEventListener('keydown', e=>{
+  if (e.key==='ArrowLeft'  && idx<items.length) decide(items[idx],'left',  stage.querySelector('.card:last-child'));
+  if (e.key==='ArrowRight' && idx<items.length) decide(items[idx],'right', stage.querySelector('.card:last-child'));
+  if (e.key==='ArrowDown' || e.key==='Backspace') { e.preventDefault(); undo(); }
+});
+render();
+</script>
+</body>
+</html>
