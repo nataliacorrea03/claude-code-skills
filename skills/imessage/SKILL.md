@@ -7,6 +7,8 @@ description: Read and send iMessages via local macOS capabilities (no third-part
 
 Read and send iMessages locally. No MCP server, no cloud API. Two modes with very different permission costs.
 
+**Requires a Mac with iMessage set up:** Messages must be signed into your Apple ID and able to send from this Mac. macOS only, this does not work on Windows, Linux, or from a phone alone.
+
 ## When to use
 
 - "Text Alex that I'm running 10 min late"
