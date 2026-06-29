@@ -17,6 +17,10 @@ A skill is just a folder with a `SKILL.md` inside. Claude Code reads it and gain
 
 Most "prompt tips" lists go stale the moment a new model ships. These skills encode the parts that *don't* change: how to delegate well, how to tell good output from confident-sounding output, and how to keep your own judgment in the loop. Two of them (`working-with-claude`, `no-bullshit`) are pure working philosophy. Two (`build-mode`, `generate-system-map`) are practical tools you run.
 
+## Looking for build recipes?
+
+These are skills you install and invoke. If you instead want prompts you paste once to *build* something (a tool, an automation, a custom skill), see the companion repo: [claude-code-recipes](https://github.com/nataliacorrea03/claude-code-recipes).
+
 ## Install
 
 A skill is a folder. Installing one is copying that folder into your skills directory.
