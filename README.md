@@ -13,10 +13,11 @@ A skill is just a folder with a `SKILL.md` inside. Claude Code reads it and gain
 | **no-bullshit** | Forces the model to verify before it claims. Bans fabricated APIs, file paths, and citations. Blocks "it works" without execution proof. Requires an inline uncertainty label on every shaky claim. | `/no-bullshit` |
 | **generate-system-map** | Scans your skills and scheduled agents and generates a standalone interactive HTML map of your whole automation setup: a radial mind-map, a schedule view, and a feedback panel that outputs copy-ready fix prompts. Most useful once you run several skills or scheduled agents. | `/generate-system-map` |
 | **imessage** | Read and send iMessages from your Mac using built-in macOS tools, no third-party app. Drafts only by default, sends on your explicit "send it." Send mode needs one scoped permission; read mode (pulling past threads) needs Full Disk Access and warns you first. | `/imessage` |
+| **plain-english** | Rewrites Claude's last answer (or any text you point it at) into something short and jargon-free. Fire it the moment a reply is too long or too technical. It also nudges the rest of the session to stay plain. | `/plain-english` |
 
 ## Why these exist
 
-Most "prompt tips" lists go stale the moment a new model ships. These skills encode the parts that *don't* change: how to delegate well, how to tell good output from confident-sounding output, and how to keep your own judgment in the loop. Two of them (`working-with-claude`, `no-bullshit`) are pure working philosophy. The rest (`build-mode`, `generate-system-map`, `imessage`) are practical tools you run.
+Most "prompt tips" lists go stale the moment a new model ships. These skills encode the parts that *don't* change: how to delegate well, how to tell good output from confident-sounding output, and how to keep your own judgment in the loop. Some change how Claude communicates with you (`working-with-claude`, `no-bullshit`, `plain-english`); the rest are practical tools you run (`build-mode`, `generate-system-map`, `imessage`).
 
 ## Looking for build recipes?
 
