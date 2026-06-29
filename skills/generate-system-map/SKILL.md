@@ -1,13 +1,18 @@
+---
+name: generate-system-map
+description: Generates a standalone, interactive HTML map of your Claude Code automation setup: a radial SVG mind-map of your skills grouped into departments, a schedule view of every scheduled task, and a feedback panel that turns flagged issues into copy-ready fix prompts. Best if you run several skills and/or scheduled agents. Trigger on "/generate-system-map", "map my skills", "generate a system map", "visualize my automations", or "build a map of my setup".
+---
+
 # generate-system-map
 
-Generates a personalized automation workflow map — a standalone HTML microsite with an interactive SVG mind map, schedule tab, and a feedback/issue-flagging system that outputs copy-ready fix prompts.
+Generates a personalized automation workflow map: a standalone HTML microsite with an interactive SVG mind map, schedule tab, and a feedback/issue-flagging system that outputs copy-ready fix prompts.
 
 ## What gets produced
 
-A single `system-map.html` file. Open it in any browser — no server needed. Three tabs:
-- **Workflow Map** — radial SVG mind map: center hub → dept nodes → leaf skill nodes. Layout auto-adapts: 1–8 departments supported with coordinate tables for each count.
-- **Schedule** — table of every task's timing, frequency, and trigger source
-- **Feedback** — flag issues on any node, then generate organized fix prompts per skill/file
+A single `system-map.html` file. Open it in any browser, no server needed. Three tabs:
+- **Workflow Map**: radial SVG mind map: center hub → dept nodes → leaf skill nodes. Layout auto-adapts: 1–8 departments supported with coordinate tables for each count.
+- **Schedule**: table of every task's timing, frequency, and trigger source
+- **Feedback**: flag issues on any node, then generate organized fix prompts per skill/file
 
 ## When to run
 
@@ -20,15 +25,15 @@ Run this when someone on the team wants their own copy of the workflow map custo
 ### 1. Discover the system
 
 Read these in parallel:
-- `~/.claude/skills/` — list all skill directories, then read each `SKILL.md` to understand what each skill does, its trigger type, and any timing info. In each `SKILL.md`, look for the DEPLOYMENT / trigger line that names the skill's `trig_*` routine ID and its timing (e.g. "weekday 8am ET via cloud routine trig_01...").
-- `~/.claude/CLAUDE.md` if it exists — project name, company name, system overview
-- `~/CLAUDE.md` if it exists — same
-- Live cloud routines: load the `RemoteTrigger` tool via ToolSearch (query `select:RemoteTrigger`), then list the live routines to get each one's `trig_*` ID and cron schedule. This is the source of truth for what actually fires and when — cross-check it against the timing each `SKILL.md` claims.
+- `~/.claude/skills/`: list all skill directories, then read each `SKILL.md` to understand what each skill does, its trigger type, and any timing info. In each `SKILL.md`, look for the DEPLOYMENT / trigger line that names the skill's `trig_*` routine ID and its timing (e.g. "weekday 8am ET via cloud routine trig_01...").
+- `~/.claude/CLAUDE.md` if it exists: project name, company name, system overview
+- `~/CLAUDE.md` if it exists: same
+- Live cloud routines: load the `RemoteTrigger` tool via ToolSearch (query `select:RemoteTrigger`), then list the live routines to get each one's `trig_*` ID and cron schedule. This is the source of truth for what actually fires and when, cross-check it against the timing each `SKILL.md` claims.
 - Local LaunchAgents: run `ls ~/Library/LaunchAgents/com.<yourname>.*` to find any local scheduled agents (e.g. the inventory LaunchAgent). Read each plist for its `StartCalendarInterval` timing and the script it runs.
 
 ### 2. Organize into departments
 
-Group the discovered skills into departments based on what makes sense for their system. **Do not force exactly 4** — use however many naturally emerge (1–8 is the supported range). Better to have the right number of groups than to artificially merge or split things.
+Group the discovered skills into departments based on what makes sense for their system. **Do not force exactly 4**, use however many naturally emerge (1–8 is the supported range). Better to have the right number of groups than to artificially merge or split things.
 
 Grouping heuristics:
 - Skills that fire on a timer/server schedule → one scheduler dept
@@ -65,7 +70,7 @@ Write a complete `system-map.html` using the template below, substituting all `[
 
 ## HTML template
 
-The full file structure to generate. Replace every `[PLACEHOLDER]` with real content. Keep all CSS, JS logic, and modal infrastructure exactly as-is — only change data/content.
+The full file structure to generate. Replace every `[PLACEHOLDER]` with real content. Keep all CSS, JS logic, and modal infrastructure exactly as-is, only change data/content.
 
 ```html
 <!DOCTYPE html>
@@ -269,7 +274,7 @@ svg { display: block; }
       <div>
         <div class="comment-node-badge" id="comment-node-badge"></div>
         <div class="comment-card-title">Report an issue</div>
-        <div class="comment-card-sub">Be specific — what's broken, slow, unclear, or wrong?</div>
+        <div class="comment-card-sub">Be specific: what's broken, slow, unclear, or wrong?</div>
       </div>
       <button class="comment-x" onclick="closeComment()">×</button>
     </div>
@@ -326,7 +331,7 @@ function switchTab(name) {
   if (name === 'feedback') renderFeedback();
 }
 
-// ── SKILL_MAP — update these with your real file paths ─────
+// ── SKILL_MAP: update these with your real file paths ─────
 // Format: 'node-id': { skill: 'skill-name', files: ['path/to/skill', 'path/to/data'] }
 const SKILL_MAP = {
   // [GENERATE SKILL_MAP ENTRIES FROM DISCOVERED SKILLS]
@@ -385,7 +390,7 @@ function renderFeedback() {
   const items = getComments();
   const wrap = document.getElementById('fb-content');
   const canGenerate = items.length > 0;
-  let html = `<div class="fb-header"><div><div class="fb-title">💬 Feedback</div><div class="fb-sub">${items.length} issue${items.length !== 1 ? 's' : ''} reported${items.length ? ' — ready to generate fix prompts' : ''}</div></div><button class="btn-generate" onclick="generatePrompts()" ${canGenerate ? '' : 'disabled'}>✨ Generate Fix Prompts</button></div>`;
+  let html = `<div class="fb-header"><div><div class="fb-title">💬 Feedback</div><div class="fb-sub">${items.length} issue${items.length !== 1 ? 's' : ''} reported${items.length ? ', ready to generate fix prompts' : ''}</div></div><button class="btn-generate" onclick="generatePrompts()" ${canGenerate ? '' : 'disabled'}>✨ Generate Fix Prompts</button></div>`;
   if (items.length === 0) {
     html += `<div class="fb-empty"><div class="fb-empty-icon">🐛</div><div class="fb-empty-title">No issues reported yet</div><div class="fb-empty-hint">Hover over any node on the Workflow Map and click the <strong>+</strong> button.<br>Or use the <strong>📝</strong> buttons on the Schedule tab.</div></div>`;
   } else {
@@ -447,7 +452,7 @@ function copyAllPrompts() {
 }
 function closePrompts() { document.getElementById('prompt-modal').classList.remove('open'); }
 
-// ── SCHEDULE DATA — fill in your tasks ────────────────────
+// ── SCHEDULE DATA: fill in your tasks ────────────────────
 // Each section groups tasks by trigger type.
 // Fields: id, icon, name, dept, deptClass, type, typeClass, time, freq, days, desc, trig
 const SCHED = [
@@ -534,7 +539,7 @@ updateBadge();
 
 ---
 
-## SVG layout reference — flexible by dept count
+## SVG layout reference: flexible by dept count
 
 viewBox="0 0 1440 900". Center hub at x=618 y=420 w=204 h=80 rx=18 (indigo #4f46e5, white text). Center point: 720,460.
 
@@ -657,14 +662,14 @@ For 7–8 depts with many leaves, shrink leaf to w=145 h=40 rx=8.
 ## Department color palette
 
 Assign colors in this order (reuse if >8 depts):
-1. Amber: fill=#fef3c7 stroke=#d97706 text=#78350f sub=#a16207 — leaf fill=#fffbeb leaf-stroke=#fcd34d leaf-text=#78350f leaf-sub=#a16207
-2. Green: fill=#d1fae5 stroke=#059669 text=#064e3b sub=#065f46 — leaf fill=#ecfdf5 leaf-stroke=#6ee7b7 leaf-text=#064e3b leaf-sub=#047857
-3. Pink: fill=#fce7f3 stroke=#db2777 text=#831843 sub=#9d174d — leaf fill=#fff1f2 leaf-stroke=#fca5a5 leaf-text=#9f1239 leaf-sub=#be123c
-4. Blue: fill=#e0f2fe stroke=#0284c7 text=#0c4a6e sub=#075985 — leaf fill=#f0f9ff leaf-stroke=#7dd3fc leaf-text=#0c4a6e leaf-sub=#0369a1
-5. Violet: fill=#ede9fe stroke=#7c3aed text=#3b0764 sub=#5b21b6 — leaf fill=#f5f3ff leaf-stroke=#c4b5fd leaf-text=#3b0764 leaf-sub=#6d28d9
-6. Orange: fill=#ffedd5 stroke=#ea580c text=#431407 sub=#9a3412 — leaf fill=#fff7ed leaf-stroke=#fdba74 leaf-text=#431407 leaf-sub=#c2410c
-7. Teal: fill=#ccfbf1 stroke=#0d9488 text=#042f2e sub=#0f766e — leaf fill=#f0fdfa leaf-stroke=#5eead4 leaf-text=#042f2e leaf-sub=#0f766e
-8. Rose: fill=#ffe4e6 stroke=#e11d48 text=#4c0519 sub=#881337 — leaf fill=#fff1f2 leaf-stroke=#fda4af leaf-text=#4c0519 leaf-sub=#be123c
+1. Amber: fill=#fef3c7 stroke=#d97706 text=#78350f sub=#a16207, leaf fill=#fffbeb leaf-stroke=#fcd34d leaf-text=#78350f leaf-sub=#a16207
+2. Green: fill=#d1fae5 stroke=#059669 text=#064e3b sub=#065f46, leaf fill=#ecfdf5 leaf-stroke=#6ee7b7 leaf-text=#064e3b leaf-sub=#047857
+3. Pink: fill=#fce7f3 stroke=#db2777 text=#831843 sub=#9d174d, leaf fill=#fff1f2 leaf-stroke=#fca5a5 leaf-text=#9f1239 leaf-sub=#be123c
+4. Blue: fill=#e0f2fe stroke=#0284c7 text=#0c4a6e sub=#075985, leaf fill=#f0f9ff leaf-stroke=#7dd3fc leaf-text=#0c4a6e leaf-sub=#0369a1
+5. Violet: fill=#ede9fe stroke=#7c3aed text=#3b0764 sub=#5b21b6, leaf fill=#f5f3ff leaf-stroke=#c4b5fd leaf-text=#3b0764 leaf-sub=#6d28d9
+6. Orange: fill=#ffedd5 stroke=#ea580c text=#431407 sub=#9a3412, leaf fill=#fff7ed leaf-stroke=#fdba74 leaf-text=#431407 leaf-sub=#c2410c
+7. Teal: fill=#ccfbf1 stroke=#0d9488 text=#042f2e sub=#0f766e, leaf fill=#f0fdfa leaf-stroke=#5eead4 leaf-text=#042f2e leaf-sub=#0f766e
+8. Rose: fill=#ffe4e6 stroke=#e11d48 text=#4c0519 sub=#881337, leaf fill=#fff1f2 leaf-stroke=#fda4af leaf-text=#4c0519 leaf-sub=#be123c
 
 ---
 
@@ -703,14 +708,14 @@ The `cx` = node rect x + node rect width − 5 (places it at the right edge of t
 - [ ] All `[PLACEHOLDER]` tokens replaced
 - [ ] Number of dept nodes matches what was discovered (not forced to 4)
 - [ ] Layout coordinates match the correct layout table for the actual dept count
-- [ ] No nodes overlap — minimum 20px gap between any two rects
+- [ ] No nodes overlap, minimum 20px gap between any two rects
 - [ ] All content fits inside the viewBox (adjust viewBox height for 7–8 dept layouts)
 - [ ] SKILL_MAP has an entry for every node id used in the SVG `onclick` calls
 - [ ] SCHED has at least one section with one item
 - [ ] M (detail modal data) has an entry for every node id used in `showModal()` calls
 - [ ] Every leaf/dept/center node `onclick` calls `showModal('id')` with an id that exists in M
 - [ ] Every node has a `+` comment button as its last child `<g class="comment-btn">`
-- [ ] Every comment `+` button calls `openComment('id','Name','Category')` — ids match SKILL_MAP or use the dept name as category
+- [ ] Every comment `+` button calls `openComment('id','Name','Category')`, ids match SKILL_MAP or use the dept name as category
 - [ ] File paths in SKILL_MAP point to real locations on the teammate's system
 - [ ] The `[YOUR_PROJECT_DIR]` placeholder in the prompt template is replaced with the actual working directory
 - [ ] Connector lines terminate at actual node edges (not at centers or random coords)

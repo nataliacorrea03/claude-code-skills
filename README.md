@@ -2,16 +2,16 @@
 
 A small, opinionated collection of [Claude Code](https://claude.com/claude-code) **skills** for working with AI like a craftsperson, not a button-masher.
 
-A skill is just a folder with a `SKILL.md` inside. Claude Code reads it and gains a new, reliable behavior you can invoke by name. These four are battle-tested in daily use and stripped of anything personal, so you can drop them straight into your own setup.
+A skill is just a folder with a `SKILL.md` inside. Claude Code reads it and gains a new, reliable behavior you can invoke by name. These are skills I use daily, stripped of anything personal, so you can drop them straight into your own setup.
 
 ## What's inside
 
 | Skill | What it does | Invoke with |
 |-------|--------------|-------------|
-| **working-with-claude** | Anthropic's official best practices, distilled from all nine Anthropic Academy courses into one reference: the 4D framework, what the model can and can't do, the prompting techniques that actually move quality, and Claude Code operating discipline. | `/working-with-claude` |
+| **working-with-claude** | Anthropic's official best practices, distilled from Anthropic's Academy courses into one reference: the 4D framework, what the model can and can't do, the prompting techniques that actually move quality, and Claude Code operating discipline. | `/working-with-claude` |
 | **build-mode** | A teach-while-building mode. Claude explains each non-trivial change in plain English, surfaces design decisions as options-with-tradeoffs for *you* to pick, and runs a short gut-check at the end so you actually understand what got built. | `/build-mode` |
 | **no-bullshit** | Forces the model to verify before it claims. Bans fabricated APIs, file paths, and citations. Blocks "it works" without execution proof. Requires an inline uncertainty label on every shaky claim. | `/no-bullshit` |
-| **generate-system-map** | Scans your skills and scheduled agents and generates a standalone interactive HTML map of your whole automation setup: a radial mind-map, a schedule view, and a feedback panel that outputs copy-ready fix prompts. | `/generate-system-map` |
+| **generate-system-map** | Scans your skills and scheduled agents and generates a standalone interactive HTML map of your whole automation setup: a radial mind-map, a schedule view, and a feedback panel that outputs copy-ready fix prompts. Most useful once you run several skills or scheduled agents. | `/generate-system-map` |
 
 ## Why these exist
 
@@ -24,6 +24,7 @@ A skill is a folder. Installing one is copying that folder into your skills dire
 **For all your projects (user-level):**
 ```bash
 git clone https://github.com/nataliacorrea03/claude-code-skills.git
+mkdir -p ~/.claude/skills
 cp -r claude-code-skills/skills/* ~/.claude/skills/
 ```
 
@@ -37,7 +38,11 @@ Pick only the ones you want, e.g. just one:
 cp -r claude-code-skills/skills/no-bullshit ~/.claude/skills/
 ```
 
-Restart Claude Code (or run `/reload`) and the skill is live. The folder name is the command, so `skills/no-bullshit/` becomes `/no-bullshit`.
+Restart Claude Code and the skill is live. The folder name is the command, so `skills/no-bullshit/` becomes `/no-bullshit`.
+
+**Confirm it worked:** run `ls ~/.claude/skills` to see the installed folders, then type the command (e.g. `/no-bullshit`) inside Claude Code.
+
+**Remove one:** delete its folder, e.g. `rm -rf ~/.claude/skills/no-bullshit`.
 
 ## Using them
 
