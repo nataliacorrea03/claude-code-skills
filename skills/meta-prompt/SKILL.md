@@ -1,5 +1,5 @@
 ---
-name: meta-ai-prompt-builder
+name: meta-prompt
 description: Builds ready-to-paste Meta AI (Muse Spark) prompts for reading Instagram, Facebook, and Threads directly. Describe a research goal (find micro-influencers or ambassadors, find videos to react to, monitor brand mentions, scan niche trends, check saturation, mine comments, tear down a competitor, verify handles, study a creator's voice before a pitch) and this skill asks a few clarifying questions, fills the variables (niche, follower range, brand, time window, etc.), and outputs a copy-paste prompt for the meta.ai app. It never calls Meta AI itself and never invents capabilities. Trigger on "/meta-prompt", "build a meta ai prompt", "meta prompt for <goal>", "find microinfluencers on instagram", "find videos to react to", "monitor mentions of <brand>", "what's trending on instagram for <niche>", or any request to research Instagram creators, content, or brands that would be run inside Meta AI.
 ---
 
