@@ -15,6 +15,7 @@ A skill is just a folder with a `SKILL.md` inside. Claude Code reads it and gain
 | **imessage** | Read and send iMessages from your Mac using built-in macOS tools, no third-party app. Drafts only by default, sends on your explicit "send it." Send mode needs one scoped permission; read mode (pulling past threads) needs Full Disk Access and warns you first. | `/imessage` |
 | **plain-english** | Rewrites Claude's last answer (or any text you point it at) into something short and jargon-free. Fire it the moment a reply is too long or too technical. It also nudges the rest of the session to stay plain. | `/plain-english` |
 | **swipe** | Turns digital cleanup into a Tinder-style swipe deck on your phone. Point it at a folder (or your unread texts), swipe each card left or right on your phone over local WiFi, and the actions run in one reversible batch (files to Trash, replies staged, never auto-sent). Built for the task paralysis where a folder of 300 screenshots is easier to ignore than to face. macOS. | `/swipe` |
+| **ai-writing-qa** | Scrubs scripts and copy for AI tells before they ship, then hands back a clean rewrite in your voice. Catches em dashes, blacklisted buzzwords, "not X it's Y" contrasts, tricolons, warmup, hedging, and dated short-form hooks. Auto-detects register (client-facing / internal / creative) and rewrites every line that trips. Draft only, never sends. | `/ai-writing-qa` |
 
 ## Why these exist
 
