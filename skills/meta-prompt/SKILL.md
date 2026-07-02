@@ -1,6 +1,6 @@
 ---
 name: meta-prompt
-description: Builds ready-to-paste Meta AI (Muse Spark) prompts for reading Instagram, Facebook, and Threads directly. Describe a research goal (find micro-influencers or ambassadors, find videos to react to, monitor brand mentions, scan niche trends, check saturation, mine comments, tear down a competitor, verify handles, study a creator's voice before a pitch) and this skill asks a few clarifying questions, fills the variables (niche, follower range, brand, time window, etc.), and outputs a copy-paste prompt for the meta.ai app. It never calls Meta AI itself and never invents capabilities. Trigger on "/meta-prompt", "build a meta ai prompt", "meta prompt for <goal>", "find microinfluencers on instagram", "find videos to react to", "monitor mentions of <brand>", "what's trending on instagram for <niche>", or any request to research Instagram creators, content, or brands that would be run inside Meta AI.
+description: Builds ready-to-paste Meta AI (Muse Spark) prompts for reading Instagram, Facebook, and Threads directly. Describe a research goal (find micro-influencers or ambassadors, find videos to react to, monitor brand mentions, scan niche trends, check saturation, mine comments, tear down a competitor, verify handles, study a creator's voice before a pitch) and this skill asks a few clarifying questions, fills the variables (niche, follower range, brand, time window, etc.), and outputs a copy-paste prompt for the meta.ai app. It also hands out the Hook Machine, a full multi-turn workflow that analyzes a creator's top reels, extracts why the winners win, builds a grading rubric, then generates, grades, and rewrites hooks. It never calls Meta AI itself and never invents capabilities. Trigger on "/meta-prompt", "build a meta ai prompt", "meta prompt for <goal>", "find microinfluencers on instagram", "find videos to react to", "monitor mentions of <brand>", "what's trending on instagram for <niche>", "hook machine", "analyze a creator's hooks", "build a hook rubric", or any request to research Instagram creators, content, or brands that would be run inside Meta AI.
 ---
 
 # Meta AI Prompt Builder
@@ -38,6 +38,9 @@ The prompt templates live in `prompts/library.md`. Read it when this skill runs.
 | C1 | Brand mention monitor |
 | C2 | Competitor account teardown |
 | D1 | Creator voice study before a pitch |
+| E1 | Hook Machine (full multi-turn workflow, delivered whole, not variable-filled) |
+
+**E1 is different from the rest.** It lives in `prompts/hook-machine.md`, not in `library.md`, and it is not a single-shot template. It is a complete multi-turn workflow the user works through inside meta.ai. When the goal is hook analysis or hook writing off a real creator's reels, hand out the entire `hook-machine.md` code block unchanged (do not fill variables, do not trim steps, do not strip the STEP 0 capability check). Say the honest caveat noted in that file: the workflow depends on Muse Spark returning transcripts and view counts, which is unverified, and STEP 0 forces meta.ai to admit what it cannot pull before anything else runs.
 
 ## Flow
 

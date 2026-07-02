@@ -332,3 +332,11 @@ Rules: cite real post links; if you cannot confirm something, say "unsure", do n
 
 Do not use em dashes.
 ```
+
+---
+
+## E1: Hook Machine (full workflow, not a single-shot template)
+
+**Use when:** the user wants to analyze a creator's top reels, work out why the winners win, and generate/grade/rewrite hooks off that.
+**Where it lives:** `prompts/hook-machine.md`, not here. It is a complete multi-turn workflow, not a fill-in-the-blank template.
+**How to hand it out:** output the entire `hook-machine.md` code block unchanged, in one code block, with the paste instruction. Do not fill variables, do not trim steps, never strip the STEP 0 capability check. Say the honest caveat: the workflow depends on Muse Spark returning verbatim transcripts and view counts, which is unverified, and STEP 0 forces meta.ai to report what it cannot pull before anything else runs.
