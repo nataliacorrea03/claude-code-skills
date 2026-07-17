@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Daily hands-off problem-log. Edit the path below to point at your copy of
+     this skill, then: launchctl load ~/Library/LaunchAgents/com.example.problem-log-daily.plist -->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.example.problem-log-daily</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/zsh</string>
+        <string>/PATH/TO/skills/problem-log/daily-sweep.sh</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key><integer>7</integer>
+        <key>Minute</key><integer>45</integer>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>/tmp/problem-log.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/problem-log.log</string>
+</dict>
+</plist>

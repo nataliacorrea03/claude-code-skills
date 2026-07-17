@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Daily hands-off build-capture. Edit the path below to point at your copy of
+     this skill, then: launchctl load ~/Library/LaunchAgents/com.example.build-capture-daily.plist -->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.example.build-capture-daily</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/zsh</string>
+        <string>/PATH/TO/skills/build-capture/daily-sweep.sh</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key><integer>7</integer>
+        <key>Minute</key><integer>35</integer>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>/tmp/build-capture.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/build-capture.log</string>
+</dict>
+</plist>
