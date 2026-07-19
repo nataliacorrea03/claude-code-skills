@@ -2,9 +2,17 @@ import argparse, json, os, sys
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".gif", ".heic", ".webp", ".tiff", ".tif", ".bmp"}
 TEXT_EXTS = {".txt", ".text", ".md", ".markdown", ".csv", ".tsv", ".log", ".json",
-             ".yaml", ".yml", ".xml", ".html", ".htm", ".css", ".js", ".ts", ".py",
-             ".sh", ".rb", ".go", ".rs", ".ini", ".conf", ".toml", ".rtf", ".srt", ".vtt"}
+             ".yaml", ".yml", ".xml", ".html", ".htm", ".css", ".js", ".jsx", ".ts",
+             ".tsx", ".py", ".sh", ".rb", ".go", ".rs", ".ini", ".conf", ".toml",
+             ".rtf", ".srt", ".vtt"}
+# Types QuickLook (qlmanage) can render a real thumbnail for on macOS - first
+# page of a PDF, a poster frame from video, first slide/page of Office docs,
+# a rasterized SVG. Without this these all fell back to a bare 📄 icon.
+QL_EXTS = {".pdf", ".mov", ".mp4", ".m4v", ".avi", ".key", ".pptx", ".ppt",
+           ".docx", ".doc", ".pages", ".numbers", ".xlsx", ".xls", ".svg",
+           ".ai", ".eps", ".psd"}
 PREVIEW_CHARS = 1200
+ZIP_LIST_CAP = 40
 MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 
 def read_preview(path):
@@ -15,6 +23,18 @@ def read_preview(path):
         return None
     text = text.strip()
     return text or None
+
+def zip_preview(path):
+    import zipfile
+    try:
+        with zipfile.ZipFile(path) as zf:
+            names = zf.namelist()
+    except Exception:
+        return None
+    lines = [f"{len(names)} item{'s' if len(names) != 1 else ''}:"] + names[:ZIP_LIST_CAP]
+    if len(names) > ZIP_LIST_CAP:
+        lines.append(f"... +{len(names) - ZIP_LIST_CAP} more")
+    return "\n".join(lines)
 
 def human_size(n):
     for unit in ["B", "KB", "MB", "GB"]:
@@ -52,12 +72,17 @@ def build(folder, cap, sort):
             "label": name,
             "sub": f"{human_size(size)} · {short_date(mtime)}",
             "path": os.path.abspath(path),
-            "thumb": is_img,
+            "thumb": is_img or ext in QL_EXTS,
         }
-        if not is_img and ext in TEXT_EXTS:
-            pv = read_preview(path)
-            if pv:
-                item["preview"] = pv
+        if not is_img:
+            if ext in TEXT_EXTS:
+                pv = read_preview(path)
+                if pv:
+                    item["preview"] = pv
+            elif ext == ".zip":
+                pv = zip_preview(path)
+                if pv:
+                    item["preview"] = pv
         items.append(item)
     return {
         "source": "files",

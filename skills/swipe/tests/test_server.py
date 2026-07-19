@@ -3,7 +3,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SERVER = ROOT / "server.py"
-RUN = ROOT / ".run"
 
 # 1x1 PNG so sips has a real image to downscale
 PNG_1x1 = base64.b64decode(
@@ -12,9 +11,12 @@ PNG_1x1 = base64.b64decode(
 def free_port():
     s = socket.socket(); s.bind(("127.0.0.1", 0)); p = s.getsockname()[1]; s.close(); return p
 
-def start(manifest_path, port):
+def start(manifest_path, port, run_dir):
+    # --rundir isolates each test run from the skill's live .run/ dir - without
+    # this, running tests clobbers whatever real decisions.json is in flight.
     proc = subprocess.Popen([sys.executable, str(SERVER), str(manifest_path),
-                             "--port", str(port), "--host", "127.0.0.1"])
+                             "--port", str(port), "--host", "127.0.0.1",
+                             "--rundir", str(run_dir)])
     for _ in range(50):
         try:
             urllib.request.urlopen(f"http://127.0.0.1:{port}/", timeout=1); return proc
@@ -25,6 +27,7 @@ def start(manifest_path, port):
 class ServerTest(unittest.TestCase):
     def test_serves_deck_and_captures_decisions(self):
         tmp = Path(tempfile.mkdtemp())
+        RUN = tmp / ".run"
         img = tmp / "p.png"; img.write_bytes(PNG_1x1)
         manifest = {"source": "files", "title": "t",
                     "left": {"label": "Trash", "kind": "trash"},
@@ -33,7 +36,7 @@ class ServerTest(unittest.TestCase):
                                "sub": "1 B", "path": str(img), "thumb": True}]}
         mpath = tmp / "m.json"; mpath.write_text(json.dumps(manifest))
         port = free_port()
-        proc = start(mpath, port)
+        proc = start(mpath, port, RUN)
         try:
             base = f"http://127.0.0.1:{port}"
             html = urllib.request.urlopen(base + "/").read().decode()

@@ -1,6 +1,6 @@
 ---
 name: swipe
-description: Turn a pile of digital cleanup into a Tinder-style swipe deck on your phone. Point it at a folder (or your unread texts) and it serves a card deck to your phone over local WiFi. Swipe each card left or right, and the chosen action runs in one reversible batch at the end. Files swipe to Trash (recoverable, never deleted outright), texts swipe to skip or reply (replies are staged, never auto-sent). Built for the kind of task paralysis where 300 screenshots in a folder is easier to ignore than to face. Trigger on "/swipe", "let me swipe through my desktop", "swipe to clean out <folder>", "swipe my screenshots", "swipe my downloads", "swipe my unread texts", "give me a deck to clean out X".
+description: Turn a pile of digital cleanup into a Tinder-style swipe deck on your phone. Point it at a folder (or your unread texts) and it serves a card deck to your phone over local WiFi. Swipe each card left or right, and the chosen action runs in one reversible batch at the end. Files swipe to Trash (recoverable, never deleted outright), texts swipe to skip or reply (replies are staged, never auto-sent). Cards show a real preview whenever possible, not just a filename, so you are never swiping blind. Built for the kind of task paralysis where 300 screenshots in a folder is easier to ignore than to face. Trigger on "/swipe", "let me swipe through my desktop", "swipe to clean out <folder>", "swipe my screenshots", "swipe my downloads", "swipe my unread texts", "give me a deck to clean out X".
 ---
 
 # swipe
@@ -18,6 +18,7 @@ Design rules that make it work, do not break them:
 - **No guilt, no streaks, no counters that shame you.** Just the deck and a running position.
 - **Reversible.** Trash, not delete. Staged replies, not sent messages.
 - **One uninterrupted session.** See below.
+- **Never make someone swipe blind.** Every card should tell you enough to actually decide. See Previews below.
 
 ## The engine is source-agnostic
 
@@ -51,8 +52,20 @@ The server and deck do not know or care what they are showing. They render whate
 
 - `left` / `right` set the two swipe actions and their on-screen labels. `kind` is a free-form tag your executor reads.
 - `reply: true` makes each text card show a reply box.
-- `type` controls the card: `image` renders a thumbnail from `path`, `file` renders an emoji icon (or the text `preview` if present), `text` renders `sender` + `preview`.
+- `type` controls the card: `image` and `file` both render an image thumbnail from `path` when `thumb` is true; `text` renders `sender` + `preview`.
 - `id` must be a unique string. Decisions come back keyed by `id`.
+
+### Previews: never swipe blind
+
+A card with nothing but a filename is a coin flip, not a decision. The Files adapter tries hard to give every card something real to look at:
+
+- **Images** get a real thumbnail (resized via `sips`).
+- **PDFs, videos (`.mov`/`.mp4`/...), Office docs (`.pptx`/`.docx`/`.key`/...), and `.svg`** get a real thumbnail too, rendered on macOS by QuickLook (`qlmanage -t`) - first page of a PDF, poster frame of a video, first slide of a deck. SVGs are served directly since a browser can already render them.
+- **Text-like files** (`.txt`, `.md`, `.json`, `.py`, `.jsx`, source code, etc.) get an inline text snippet instead of a thumbnail.
+- **`.zip` archives** get a contents listing (file names inside) instead of nothing.
+- Anything else falls back to a plain file icon - that is the one case where the adapter genuinely has nothing better to show.
+
+If you write a new adapter, try to give every item a `thumb` or a `preview`. An icon-only card is a last resort, not the default.
 
 ## Flow
 
@@ -63,7 +76,7 @@ The server and deck do not know or care what they are showing. They render whate
    **Always load the FULL pile in one deck. Never cap it or drip-feed.** The entire point is one uninterrupted swipe session; making someone come back to load "the next batch" kills the momentum that got them started. Only chunk if a set is genuinely huge (hundreds and up) and a single page would choke the phone, and if so, say so out loud. Default sort is oldest-first; do not ask unless they want largest-first.
 
 2. **Preflight.**
-   - **Network:** the deck is served to the phone over the local network, so the phone just needs to be on the same WiFi as the computer. The server auto-detects the LAN IP (`ipconfig getifaddr en0`, falling back to `en1`, `en2`). If you are on a VPN, do not hand the phone a VPN-only address; pass `--host <lan-ip>` explicitly or run on the computer's own browser with `--host 127.0.0.1`.
+   - **Network:** the deck is served to the phone over the local network, so the phone just needs to be on the same WiFi as the computer. The server auto-detects the LAN IP (`ipconfig getifaddr en0`, falling back to `en1`, `en2`). If you are on a VPN, do not hand the phone a VPN-only address; pass `--host <lan-ip>` explicitly or run on the computer's own browser with `--host 127.0.0.1`. Re-check the LAN IP if the phone can't connect - it can change mid-session (network switch, VPN toggle).
    - **iMessage source only:** reads `~/Library/Messages/chat.db`, which needs Full Disk Access for the terminal. If the adapter errors on permission, surface that.
 
 3. **Gather items.** Run the adapter, writing the manifest into the run dir. Use a high `--cap` (e.g. 1000) as a sanity ceiling only, never as a drip limit:
@@ -104,7 +117,7 @@ The server and deck do not know or care what they are showing. They render whate
 
 ## Platform notes
 
-Thumbnails (`sips`), Trash (Finder via `osascript`), and the iMessage source (`chat.db`) are macOS-specific. The server and deck themselves are plain Python and a single HTML file, so a new adapter plus a new executor could target another OS without touching the engine.
+Thumbnails (`sips` for images, `qlmanage` for PDFs/video/Office docs), Trash (Finder via `osascript`), and the iMessage source (`chat.db`) are macOS-specific. The server and deck themselves are plain Python and a single HTML file, so a new adapter plus a new executor could target another OS without touching the engine.
 
 ## Adding sources later
 

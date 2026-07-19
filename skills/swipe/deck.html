@@ -91,8 +91,16 @@ function render(){
     card.style.zIndex = 100 - j;
     if (j > idx) card.style.transform = 'translateX(-50%) scale(.96) translateY(10px)';
     let media;
-    if (it.type === 'image'){ media = document.createElement('img'); media.src = '/thumb/'+it.id;
-      media.onerror = ()=>{ const b=document.createElement('div'); b.className='filebox'; b.textContent='🖼️'; media.replaceWith(b); }; }
+    if (it.thumb){
+      media = document.createElement('img'); media.src = '/thumb/'+it.id;
+      media.onerror = ()=>{
+        let repl;
+        if (it.preview){ repl = document.createElement('pre'); repl.className='filepreview'; repl.textContent = it.preview; }
+        else { repl = document.createElement('div'); repl.className='filebox';
+          repl.textContent = it.type === 'image' ? '🖼️' : '📄'; }
+        media.replaceWith(repl);
+      };
+    }
     else if (it.type === 'file' && it.preview){ media = document.createElement('pre');
       media.className='filepreview'; media.textContent = it.preview; }
     else { media = document.createElement('div'); media.className='filebox';

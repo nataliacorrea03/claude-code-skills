@@ -24,7 +24,8 @@ class FilesAdapterTest(unittest.TestCase):
         img = next(i for i in m["items"] if i["label"] == "a.png")
         assert img["type"] == "image" and img["thumb"] is True
         pdf = next(i for i in m["items"] if i["label"] == "b.pdf")
-        assert pdf["type"] == "file" and pdf["thumb"] is False
+        # PDFs get a QuickLook-rendered thumbnail now, not a bare file icon.
+        assert pdf["type"] == "file" and pdf["thumb"] is True
         assert all(os.path.isabs(i["path"]) for i in m["items"])
 
     def test_cap_and_oldest_sort(self):
@@ -52,6 +53,26 @@ class FilesAdapterTest(unittest.TestCase):
         assert "preview" not in pic  # images use their thumbnail, no text preview
         binf = next(i for i in m["items"] if i["label"] == "data.bin")
         assert "preview" not in binf  # unknown extension gets no preview
+        assert binf["thumb"] is False  # and no QuickLook thumbnail either
+
+    def test_zip_files_carry_a_contents_listing_preview(self):
+        import zipfile
+        zpath = self.tmp / "archive.zip"
+        with zipfile.ZipFile(zpath, "w") as zf:
+            zf.writestr("readme.txt", "hi")
+            zf.writestr("photo.jpg", "x")
+        m = run(self.tmp)
+        z = next(i for i in m["items"] if i["label"] == "archive.zip")
+        assert z["type"] == "file" and z["thumb"] is False
+        assert "readme.txt" in z["preview"] and "photo.jpg" in z["preview"]
+
+    def test_pdf_and_video_and_svg_are_flagged_for_quicklook_thumbnail(self):
+        for name in ("doc.pdf", "clip.mov", "icon.svg", "deck.pptx"):
+            (self.tmp / name).write_bytes(b"x")
+        m = run(self.tmp)
+        for name in ("doc.pdf", "clip.mov", "icon.svg", "deck.pptx"):
+            item = next(i for i in m["items"] if i["label"] == name)
+            assert item["type"] == "file" and item["thumb"] is True, name
 
 if __name__ == "__main__":
     unittest.main()
